@@ -1,0 +1,40 @@
+{{ define "create_remote_thread_table" }}
+    <div class="row">
+        {{ template "events_buttons_top" . }}
+    </div>
+
+    <div class="row">
+        <table id="events" class="ui celled selectable striped compact table">
+            <thead>
+                <tr>
+                    <th>Domain</th>
+                    <th class="poppy" data-variation="basic" data-content="Host" style="text-align: center;"><i class="blue desktop icon"></i></th>
+                    <th class="poppy" data-variation="basic" data-content="Timestamp" style="text-align: center;"><i class="blue clock icon"></i></th>
+                    <th>Source Process ID</th>
+                    <th>Source Image</th>
+                </tr>
+            </thead>
+
+            <tfoot>
+            </tfoot>
+
+            <tbody>
+                {{ range $event := .events }}
+                <tr id="event{{ $event.Id }}">
+                    <td>{{ $event.Domain }}</td>
+                    <td>{{ $event.Host }}</td>
+                    <td>{{ $event.UtcTimeStr }}</td>
+                    <td style="word-wrap: break-word"><a href="#" class="toggler" event-data="{{ $event.Id }}">{{ $event.SourceImage }}</a></td>
+                </tr>
+                <tr class="child{{ $event.Id }}" style="display:none">
+                    <td colspan=8>{{ $event.OtherData }}</td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    <div>
+
+    <div class="row">
+        {{ template "events_buttons_bottom" . }}
+    </div>
+{{ end }}

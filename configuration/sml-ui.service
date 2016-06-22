@@ -1,0 +1,8 @@
+[Unit]
+Description=SML-UI
+
+[Service]
+ExecStart=/opt/sml-ui/sml-ui -c /opt/sml-ui/sml-ui.config
+
+[Install]
+WantedBy=multi-user.target
