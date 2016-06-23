@@ -1,0 +1,117 @@
+{{ define "navbar" }}
+    <div class="ui two item menu">
+        <a class="item" href="/events">Events</a>
+        <div class="ui simple dropdown item">
+            Data
+            <i class="dropdown icon"></i>
+            <div class="menu">
+                <div class="item"><a class="item" href="/processcreate">Process Create</a></div>
+                <div class="item"><a class="item" href="/processterminate">Process Terminate</a></div>
+                <div class="item"><a class="item" href="/networkconnection">Network Connection</a></div>
+                <div class="item"><a class="item" href="/filecreationtime">File Creation Time</a></div>
+                <div class="item"><a class="item" href="/driverloaded">Driver Loaded</a></div>
+                <div class="item"><a class="item" href="/imageloaded">Image Loaded</a></div>
+                <div class="item"><a class="item" href="/rawaccessread">Raw Access Read</a></div>
+                <div class="item"><a class="item" href="/createremotethread">Create Remote Thread</a></div>
+            </div>
+        </div>
+        <a class="active item" href="/export">Export</a>
+    </div>
+{{ end }}
+
+{{ define "content" }}
+    <div class="ui grid">
+        <div class="ui one column grid">
+
+            <form class="ui form" method="post" name="export_form" id="export_form">
+
+                <div id="no_type_message" class="ui warning small hidden message">
+                    <i class="close icon"></i>
+                    Type not selected
+                </div>
+
+                <div class="ui grid">
+                    <div class="row">
+                        <div class="six wide column">
+                            <label for="export_type">Type</label>
+                            <select class="form-control" name="export_type" id="export_type">
+                                <option value="0" {{ if eq .export_type 0 }}selected{{ end }} ></option>
+                                <option value="1" {{ if eq .export_type 1 }}selected{{ end }} >Process Create (Path,SHA256,COUNT) OrderBy Path</option>
+                                <option value="2" {{ if eq .export_type 2 }}selected{{ end }} >Process Create (Path,SHA256,COUNT) OrderBy Hash</option>
+                                <option value="3" {{ if eq .export_type 3 }}selected{{ end }} >Process Create (Path,MD5,COUNT) OrderBy Path</option>
+                                <option value="4" {{ if eq .export_type 4 }}selected{{ end }} >Process Create (Path,MD5,COUNT) OrderBy Hash</option>
+                                <option value="5" {{ if eq .export_type 5 }}selected{{ end }} >Driver Loaded (Path,SHA256,COUNT) OrderBy Path</option>
+                                <option value="6" {{ if eq .export_type 6 }}selected{{ end }} >Driver Loaded (Path,SHA256,COUNT) OrderBy Hash</option>
+                                <option value="7" {{ if eq .export_type 7 }}selected{{ end }} >Driver Loaded (Path,MD5,COUNT) OrderBy Path</option>
+                                <option value="8" {{ if eq .export_type 8 }}selected{{ end }} >Driver Loaded (Path,MD5,COUNT) OrderBy Hash</option>
+                                <option value="9" {{ if eq .export_type 9 }}selected{{ end }} >Image Loaded (Path,SHA256,COUNT) OrderBy Path</option>
+                                <option value="10" {{ if eq .export_type 10 }}selected{{ end }} >Image Loaded (Path,SHA256,COUNT) OrderBy Hash</option>
+                                <option value="11" {{ if eq .export_type 11 }}selected{{ end }} >Image Loaded (Path,MD5,COUNT) OrderBy Path</option>
+                                <option value="12" {{ if eq .export_type 12 }}selected{{ end }} >Image Loaded (Path,MD5,COUNT) OrderBy Hash</option>
+                                <option value="13" {{ if eq .export_type 13 }}selected{{ end }} >Network Connection (IP)</option>
+                                <option value="14" {{ if eq .export_type 14 }}selected{{ end }} >Network Connection (IP,COUNT)</option>
+                                <option value="15" {{ if eq .export_type 15 }}selected{{ end }} >Network Connection (Host)</option>
+                                <option value="16" {{ if eq .export_type 16 }}selected{{ end }} >Network Connection (Host,COUNT)</option>
+                                <option value="17" {{ if eq .export_type 17 }}selected{{ end }} >SHA256 (All)</option>
+                                <option value="18" {{ if eq .export_type 18 }}selected{{ end }} >SHA256 (Process Create)</option>
+                                <option value="19" {{ if eq .export_type 19 }}selected{{ end }} >SHA256 (Driver Loaded)</option>
+                                <option value="20" {{ if eq .export_type 20 }}selected{{ end }} >SHA256 (Image Loaded)</option>
+                                <option value="21" {{ if eq .export_type 21 }}selected{{ end }} >MD5 (All)</option>
+                                <option value="22" {{ if eq .export_type 22 }}selected{{ end }} >MD5 (Process Create)</option>
+                                <option value="23" {{ if eq .export_type 23 }}selected{{ end }} >MD5 (Driver Loaded)</option>
+                                <option value="24" {{ if eq .export_type 24 }}selected{{ end }} >MD5 (Image Loaded)</option>
+                            </select>
+                        </div>
+
+                        <div class="two wide column">
+                            <label for="search">&nbsp;</label>
+                            <div class="one wide column">
+                                <button id="search" name="search" type="button" class="tiny ui button">Search</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{ template "export_table" . }}
+            </form>
+
+         </div>
+    </div>
+
+    <script type="text/javascript">
+
+        // Allows the user to close 'no type' message
+        $('#no_type_message .close')
+            .on('click', function() {
+                $(this).parent()
+                    .removeClass('visible')
+                    .addClass('hidden');
+        });
+
+        $('.ui.dropdown')
+            .dropdown()
+        ;
+
+        // Search the link data
+        $("#search").click(function() {
+
+            var exportType = document.getElementById("export_type").value
+            if (exportType == 0) {
+                $('#no_type_message').addClass('visible')
+                $('#no_type_message').removeClass('hidden')
+                return
+            }
+
+            $("#export_form").submit();
+        });
+
+        $( document ).ready(function() {
+
+            // Setup the popup's
+            $('.poppy')
+                .popup()
+            ;
+        });
+
+    </script>
+{{ end }}

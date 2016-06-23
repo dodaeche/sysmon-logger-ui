@@ -11,5 +11,5 @@ type Config struct {
 	Debug				bool	`yaml:"debug"`
 	StaticDir 			string	`yaml:"static_dir"`
 	TemplateDir 		string	`yaml:"template_dir"`
-	//DataDir 			string	`yaml:"data_dir"`
+	ExportDir			string	`yaml:"export_dir"`
 }

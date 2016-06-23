@@ -120,3 +120,12 @@ type CreateRemoteThread struct {
 	StartFunction	string			`db:"start_function"`
 	OtherData		template.HTML	`db:"_"`
 }
+
+// Represents an "export" record
+type Export struct {
+	Id       	int64 		    `db:"id"`
+	DataType 	string 		    `db:"data_type"`
+	FileName 	string 		    `db:"file_name"`
+    Updated 	time.Time	    `db:"updated"`
+    OtherData	template.HTML	`db:"-"`
+}

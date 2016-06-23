@@ -70,6 +70,9 @@ func setupHttpServer() {
 	r.Static("/static", config.StaticDir)
 
 	r.GET("/", index)
+	r.GET("/export", export)
+    r.GET("/export/:id", exportData) // Download
+	r.POST("/export", export)
 	r.GET("/events", events)
 	r.POST("/events", events)
 	r.GET("/processcreate", processCreate)
@@ -126,10 +129,10 @@ func initialiseDatabase() {
 
 // Loads the config file contents (yaml) and marshals to a struct
 func loadConfig(configPath string) {
-	config =  new(Config)
+	config = new(Config)
 	data, err := util.ReadTextFromFile(configPath)
 	if err != nil {
-		logger.Fatal("Error reading the config file: %v", err)
+		logger.Fatalf("Error reading the config file: %v", err)
 	}
 
 	err = yaml.Unmarshal([]byte(data), &config)
@@ -160,6 +163,18 @@ func loadConfig(configPath string) {
 	if config.HttpPort == 0 {
 		config.HttpPort = 8080
 	}
+
+    if len(config.StaticDir) == 0 {
+        logger.Fatal("Static directory not set in config file")
+    }
+
+    if len(config.StaticDir) == 0 {
+        logger.Fatal("Template directory not set in config file")
+    }
+
+    if len(config.ExportDir) == 0 {
+        logger.Fatal("Export directory not set in config file")
+    }
 }
 
 // Sets up the logging infrastructure e.g. Stdout and /var/log
@@ -245,6 +260,9 @@ func loadTemplates(templatesDir string) multitemplate.Render {
 		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
 		filepath.Join(templatesDir, "create_remote_thread.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
 		filepath.Join(templatesDir, "create_remote_thread_table.tmpl"))
+	r.AddFromFiles("export",
+		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "export.tmpl"),
+		filepath.Join(templatesDir, "export_table.tmpl"))
 
 	return r
 }

@@ -7,6 +7,7 @@ import (
 	//"strings"
 	"html/template"
 	"fmt"
+    "path"
 )
 
 // ##### Methods #############################################################
@@ -366,12 +367,12 @@ func getNetworkConnectionData(numRecsPerPage int, currentPageNumber int) (bool, 
 	var data []*NetworkConnection
 
 	err := db.
-	Select("id, domain, host, utc_time, process_id, image, process_user, protocol, initiated, source_ip, source_port, destination_ip, destination_port").
-	From("network_connection").
-	OrderBy("utc_time DESC").
-	Offset(uint64(numRecsPerPage * currentPageNumber)).
-	Limit(uint64(numRecsPerPage + 1)).
-	QueryStructs(&data)
+        Select("id, domain, host, utc_time, process_id, image, process_user, protocol, initiated, source_ip, source_port, destination_ip, destination_port").
+        From("network_connection").
+        OrderBy("utc_time DESC").
+        Offset(uint64(numRecsPerPage * currentPageNumber)).
+        Limit(uint64(numRecsPerPage + 1)).
+        QueryStructs(&data)
 
 	if err != nil {
 		logger.Error(err)
@@ -424,12 +425,12 @@ func getDriverLoadedData(numRecsPerPage int, currentPageNumber int) (bool, bool,
 	var data []*DriverLoaded
 
 	err := db.
-	Select("id, domain, host, utc_time, image_loaded, md5, sha256, signed, signature").
-	From("driver_loaded").
-	OrderBy("utc_time DESC").
-	Offset(uint64(numRecsPerPage * currentPageNumber)).
-	Limit(uint64(numRecsPerPage + 1)).
-	QueryStructs(&data)
+        Select("id, domain, host, utc_time, image_loaded, md5, sha256, signed, signature").
+        From("driver_loaded").
+        OrderBy("utc_time DESC").
+        Offset(uint64(numRecsPerPage * currentPageNumber)).
+        Limit(uint64(numRecsPerPage + 1)).
+        QueryStructs(&data)
 
 	if err != nil {
 		logger.Error(err)
@@ -482,12 +483,12 @@ func getImageLoadedData(numRecsPerPage int, currentPageNumber int) (bool, bool, 
 	var data []*ImageLoaded
 
 	err := db.
-	Select("id, domain, host, utc_time, image_loaded, md5, sha256, signed, signature").
-	From("image_loaded").
-	OrderBy("utc_time DESC").
-	Offset(uint64(numRecsPerPage * currentPageNumber)).
-	Limit(uint64(numRecsPerPage + 1)).
-	QueryStructs(&data)
+        Select("id, domain, host, utc_time, image_loaded, md5, sha256, signed, signature").
+        From("image_loaded").
+        OrderBy("utc_time DESC").
+        Offset(uint64(numRecsPerPage * currentPageNumber)).
+        Limit(uint64(numRecsPerPage + 1)).
+        QueryStructs(&data)
 
 	if err != nil {
 		logger.Error(err)
@@ -540,12 +541,12 @@ func getRawAccessReadData(numRecsPerPage int, currentPageNumber int) (bool, bool
 	var data []*RawAccessRead
 
 	err := db.
-	Select("id, domain, host, utc_time, process_id, image, device").
-	From("raw_access_read").
-	OrderBy("utc_time DESC").
-	Offset(uint64(numRecsPerPage * currentPageNumber)).
-	Limit(uint64(numRecsPerPage + 1)).
-	QueryStructs(&data)
+        Select("id, domain, host, utc_time, process_id, image, device").
+        From("raw_access_read").
+        OrderBy("utc_time DESC").
+        Offset(uint64(numRecsPerPage * currentPageNumber)).
+        Limit(uint64(numRecsPerPage + 1)).
+        QueryStructs(&data)
 
 	if err != nil {
 		logger.Error(err)
@@ -624,4 +625,129 @@ func getCreateRemoteThreadData(numRecsPerPage int, currentPageNumber int) (bool,
 
 	return false, noMoreRecords, data
 }
+
+//
+func export (c *gin.Context) {
+
+    exportType := 0
+
+    temp :=  c.PostForm("export_type")
+    if len(temp) > 0 {
+        if util.IsNumber(temp) == true {
+            exportType = util.ConvertStringToInt(temp)
+        }
+    }
+
+    if exportType == 0 {
+        c.HTML(http.StatusOK, "export", gin.H{
+            "has_data": false,
+            "export_type": 0,
+            "data": nil,
+        })
+        return
+    }
+
+    errored, data := getExports(exportType)
+    if errored == true {
+        c.String(http.StatusInternalServerError, "")
+        return
+    }
+
+    hasData := true
+    if len(data) == 0 {
+        hasData = false
+    }
+
+    c.HTML(http.StatusOK, "export", gin.H{
+        "has_data": hasData,
+        "export_type": exportType,
+        "data": data,
+    })
+}
+
+//
+func getExports(exportType int) (bool, []*Export) {
+
+    var data []*Export
+
+    err := db.
+        Select(`*`).
+        From("export").
+        Where("data_type = $1", exportType).
+        Limit(10).
+        OrderBy("updated").
+        QueryStructs(&data)
+
+    if err != nil {
+        logger.Errorf("Error querying for exports: %v (%d)", err, exportType)
+        return true, data
+    }
+
+    // Perform some cleaning of the data, so that it displays better in the HTML
+    for _, v := range data {
+        v.OtherData = template.HTML(`<a href="/export/`+ util.ConvertInt64ToString(v.Id) + `">` + v.Updated.Format("15:04:05 02/01/2006") + `</a>`)
+    }
+
+    return false, data
+}
+
+//
+func exportData(c *gin.Context) {
+
+    id, successful := processInt64Parameter(c.Param("id"))
+    if successful == false {
+        c.String(http.StatusInternalServerError, "")
+        return
+    }
+
+    if id < 1 {
+        c.String(http.StatusInternalServerError, "")
+        return
+    }
+
+    errored, export := getExport(id)
+
+    if errored == true {
+        c.String(http.StatusInternalServerError, "")
+        return
+    }
+
+    // Load file contents
+    if util.DoesFileExist(path.Join(config.ExportDir, export.FileName)) == false {
+        logger.Errorf("Export file does not exist: %s", export.FileName)
+        c.String(http.StatusInternalServerError, "")
+        return
+    }
+
+    // Return file contents as download
+    data, err := util.ReadTextFromFile(path.Join(config.ExportDir, export.FileName))
+    if err != nil {
+        logger.Errorf("Error reading export file: %v (%s)", err, export.FileName)
+        c.String(http.StatusInternalServerError, "")
+        return
+    }
+
+    c.Header("Content-Disposition", "attachment; filename=\"" + export.FileName)
+    c.Data(http.StatusOK, "text/csv", []byte(data))
+}
+
+//
+func getExport(id int64) (bool, Export) {
+
+    var e Export
+
+    err := db.
+        Select(`id, data_type, file_name, updated`).
+        From("export").
+        Where("id = $1", id).
+        QueryStruct(&e)
+
+    if err != nil {
+        logger.Errorf("Error querying for export: %v", err)
+        return true, e
+    }
+
+    return false, e
+}
+
 
