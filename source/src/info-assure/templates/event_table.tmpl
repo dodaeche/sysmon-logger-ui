@@ -1,38 +1,35 @@
 {{ define "event_table" }}
-    <div class="row">
-        {{ template "events_buttons_top" . }}
-    </div>
 
-    <div class="row">
-        <table id="events" class="ui celled selectable striped compact table">
-            <thead>
-                <tr>
-                    <th>Domain</th>
-                    <th class="poppy" data-variation="basic" data-content="Host" style="text-align: center;"><i class="blue desktop icon"></i></th>
-                    <th class="poppy" data-variation="basic" data-content="Timestamp" style="text-align: center;"><i class="blue clock icon"></i></th>
-                    <th>Type</th>
-                    <th>Data</th>
-                </tr>
-            </thead>
+    &nbsp;
 
-            <tfoot>
-            </tfoot>
+    {{ template "events_buttons_top" . }}
 
-            <tbody>
-                {{ range $event := .events }}
-                <tr id="event{{ $event.Id }}">
-                    <td>{{ $event.Domain }}</td>
-                    <td>{{ $event.Host }}</td>
-                    <td>{{ $event.UtcTimeStr }}</td>
-                    <td>{{ $event.Type }}</td>
-                    <td style="word-wrap: break-word">{{ $event.MessageHtml }}</td>
-                </tr>
-                {{ end }}
-            </tbody>
-        </table>
-    <div>
+    <table id="events" class="ui celled selectable striped compact table">
+        <thead>
+            <tr>
+                <th>Domain</th>
+                <th class="poppy" data-variation="basic" data-content="Host" style="text-align: center;"><i class="blue desktop icon"></i></th>
+                <th class="poppy" data-variation="basic" data-content="Timestamp" style="text-align: center;"><i class="blue clock icon"></i></th>
+                <th>Type</th>
+                <th>Data</th>
+            </tr>
+        </thead>
 
-    <div class="row">
-        {{ template "events_buttons_bottom" . }}
-    </div>
+        <tfoot>
+        </tfoot>
+
+        <tbody>
+            {{ range $event := .events }}
+            <tr id="event{{ $event.Id }}">
+                <td>{{ $event.Domain }}</td>
+                <td>{{ $event.Host }}</td>
+                <td>{{ $event.UtcTimeStr }}</td>
+                <td>{{ $event.Type }}</td>
+                <td style="word-wrap: break-word">{{ $event.Data }}</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+
+    {{ template "events_buttons_bottom" . }}
 {{ end }}

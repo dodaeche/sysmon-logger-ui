@@ -1,16 +1,17 @@
-{{ define "process_create_table" }}
-    <div class="row">
-        {{ template "events_buttons_top" . }}
-    </div>
+{{ define "search_table" }}
 
-    <div class="row">
+    {{ if eq .has_data true }}
+
+        {{ template "events_buttons_top" . }}
+
         <table id="events" class="ui celled selectable striped compact table">
             <thead>
                 <tr>
                     <th>Domain</th>
                     <th class="poppy" data-variation="basic" data-content="Host" style="text-align: center;"><i class="blue desktop icon"></i></th>
                     <th class="poppy" data-variation="basic" data-content="Timestamp" style="text-align: center;"><i class="blue clock icon"></i></th>
-                    <th>Command Line</th>
+                    <th>Type</th>
+                    <th>Data</th>
                 </tr>
             </thead>
 
@@ -23,17 +24,23 @@
                     <td>{{ $event.Domain }}</td>
                     <td>{{ $event.Host }}</td>
                     <td>{{ $event.UtcTimeStr }}</td>
-                    <td style="word-wrap: break-word"><a href="#" class="toggler" event-data="{{ $event.Id }}">{{ $event.CommandLine }}</a></td>
-                </tr>
-                <tr class="child{{ $event.Id }}" style="display:none">
-                    <td colspan=8>{{ $event.OtherData }}</td>
+                    <td>{{ $event.Type }}</td>
+                    <td style="word-wrap: break-word">{{ $event.Data }}</td>
                 </tr>
                 {{ end }}
             </tbody>
         </table>
-    <div>
 
-    <div class="row">
+        <div>&nbsp;</div>
+
         {{ template "events_buttons_bottom" . }}
-    </div>
+    {{ end }}
+
+    <script type="text/javascript">
+        // Show/hide the child data rows
+        $(".toggler").click(function(e){
+            e.preventDefault();
+            $('.child'+$(this).attr('other-data')).toggle();
+        });
+    </script>
 {{ end }}

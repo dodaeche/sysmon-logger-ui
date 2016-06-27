@@ -69,28 +69,14 @@ func setupHttpServer() {
 	r.HTMLRender = loadTemplates(config.TemplateDir)
 	r.Static("/static", config.StaticDir)
 
-	r.GET("/", index)
-	r.GET("/export", export)
-    r.GET("/export/:id", exportData) // Download
-	r.POST("/export", export)
-	r.GET("/events", events)
-	r.POST("/events", events)
-	r.GET("/processcreate", processCreate)
-	r.POST("/processcreate", processCreate)
-	r.GET("/processterminate", processTerminate)
-	r.POST("/processterminate", processTerminate)
-	r.GET("/filecreationtime", fileCreationTime)
-	r.POST("/filecreationtime", fileCreationTime)
-	r.GET("/networkconnection", networkConnection)
-	r.POST("/networkconnection", networkConnection)
-	r.GET("/driverloaded", loadHttpRouteDriverLoaded)
-	r.POST("/driverloaded", loadHttpRouteDriverLoaded)
-	r.GET("/imageloaded", loadHttpRouteImageLoaded)
-	r.POST("/imageloaded", loadHttpRouteImageLoaded)
-	r.GET("/rawaccessread", loadHttpRouteRawAccessRead)
-	r.POST("/rawaccessread", loadHttpRouteRawAccessRead)
-	r.GET("/createremotethread", loadHttpRouteCreateRemoteThread)
-	r.POST("/createremotethread", loadHttpRouteCreateRemoteThread)
+	r.GET("/", routeIndex)
+    r.GET("/search", routeSearch)
+    r.POST("/search", routeSearch)
+	r.GET("/export", routeExport)
+    r.GET("/export/:id", routeExportData) // Download
+	r.POST("/export", routeExport)
+	r.GET("/events", routeEvents)
+	r.POST("/events", routeEvents)
 
 	r.Run(config.HttpIp + ":" + fmt.Sprintf("%d", config.HttpPort))
 }
@@ -225,44 +211,14 @@ func loadTemplates(templatesDir string) multitemplate.Render {
 	r.AddFromFiles("index",
 		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "index.tmpl"))
 	r.AddFromFiles("events",
-		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
-		filepath.Join(templatesDir, "event.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
-		filepath.Join(templatesDir, "event_table.tmpl"))
-	r.AddFromFiles("process_create",
-		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
-		filepath.Join(templatesDir, "process_create.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
-		filepath.Join(templatesDir, "process_create_table.tmpl"))
-	r.AddFromFiles("process_terminate",
-		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
-		filepath.Join(templatesDir, "process_terminate.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
-		filepath.Join(templatesDir, "process_terminate_table.tmpl"))
-	r.AddFromFiles("file_creation_time",
-		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
-		filepath.Join(templatesDir, "file_creation_time.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
-		filepath.Join(templatesDir, "file_creation_time_table.tmpl"))
-	r.AddFromFiles("network_connection",
-		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
-		filepath.Join(templatesDir, "network_connection.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
-		filepath.Join(templatesDir, "network_connection_table.tmpl"))
-	r.AddFromFiles("driver_loaded",
-		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
-		filepath.Join(templatesDir, "driver_loaded.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
-		filepath.Join(templatesDir, "driver_loaded_table.tmpl"))
-	r.AddFromFiles("image_loaded",
-		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
-		filepath.Join(templatesDir, "image_loaded.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
-		filepath.Join(templatesDir, "image_loaded_table.tmpl"))
-	r.AddFromFiles("raw_access_read",
-		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
-		filepath.Join(templatesDir, "raw_access_read.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
-		filepath.Join(templatesDir, "raw_access_read_table.tmpl"))
-	r.AddFromFiles("create_remote_thread",
-		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "data_view.tmpl"),
-		filepath.Join(templatesDir, "create_remote_thread.tmpl"), filepath.Join(templatesDir, "buttons.tmpl"),
-		filepath.Join(templatesDir, "create_remote_thread_table.tmpl"))
+		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "event.tmpl"),
+        filepath.Join(templatesDir, "buttons.tmpl"), filepath.Join(templatesDir, "event_table.tmpl"))
 	r.AddFromFiles("export",
 		filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "export.tmpl"),
 		filepath.Join(templatesDir, "export_table.tmpl"))
-
-	return r
+    r.AddFromFiles("search",
+        filepath.Join(templatesDir, "base.tmpl"), filepath.Join(templatesDir, "search.tmpl"),
+        filepath.Join(templatesDir, "buttons.tmpl"), filepath.Join(templatesDir, "search_table.tmpl"))
+    
+    return r
 }

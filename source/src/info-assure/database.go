@@ -19,7 +19,8 @@ type Event struct {
 	Base
 	Type		string			`db:"type"`
 	Message		string			`db:"message"`
-	MessageHtml	template.HTML	`db:"_"`
+	MessageHtml	string	`db:"message_html"`
+    Data	    template.HTML	`db:"_"`
 }
 
 // Represents an "process_create" record

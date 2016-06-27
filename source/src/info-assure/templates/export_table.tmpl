@@ -1,29 +1,26 @@
 {{ define "export_table" }}
     {{ if eq .has_data true }}
 
-    <div class="row">&nbsp;</div>
-    <div class="row">
-        <div class="sixteen wide column">
-        <table id="data" class="ui celled selectable striped compact table">
-            <thead>
-                <tr>
-                    <th class="poppy" data-variation="basic" data-content="Timestamp" style="text-align: center;"><i class="blue clock icon"></i></th>
-                </tr>
-            </thead>
+    &nbsp;
 
-            <tfoot>
-            </tfoot>
+    <table id="data" class="ui celled selectable striped compact table">
+        <thead>
+            <tr>
+                <th class="poppy" data-variation="basic" data-content="Timestamp" style="text-align: center;"><i class="blue clock icon"></i></th>
+            </tr>
+        </thead>
 
-            <tbody>
-                {{ range $d := .data }}
-                <tr id="summary{{ $d.Id }}">
-                    <td>{{ $d.OtherData }}</td>
-                </tr>
-                {{ end }}
-            </tbody>
-        </table>
-        </div>
-    </div>
+        <tfoot>
+        </tfoot>
+
+        <tbody>
+            {{ range $d := .data }}
+            <tr id="summary{{ $d.Id }}">
+                <td>{{ $d.OtherData }}</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
 
     {{ end }}
 {{ end }}
