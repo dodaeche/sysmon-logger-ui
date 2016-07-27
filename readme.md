@@ -37,3 +37,7 @@ The Windows service is written using the Microsoft .Net framework. The service u
 The analysis server is written in the [Go Programming Language](https://golang.org/) (golang) and is designed to run on a Linux host. The server uses a [PostgreSQL](https://www.postgresql.org/) database to store the autorun data.
 
 The UI server is again written using golang. The server implements its own HTTPS server so no other software is required.
+
+## Screenshot
+
+![](sysmonlogger.png)
